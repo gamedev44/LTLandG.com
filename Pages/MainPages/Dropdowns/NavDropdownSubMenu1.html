@@ -1,0 +1,218 @@
+<!-- File: Pages/MainPages/Dropdowns/NavDropdownSubMenu1.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Get a Quote - LTL&G</title>
+  <link rel="icon" href="../../../assets/images/logo.png" type="image/png">
+  <link rel="stylesheet" href="../../../assets/css/main.css">
+  <style>
+    .quote-accordion { margin-top: 2em; }
+    .quote-section {
+      border: 1px solid #333;
+      margin-bottom: 1em;
+      background-color: #1a1a1a;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .quote-header {
+      cursor: pointer;
+      padding: 1em;
+      background-color: #222;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    .quote-header:hover {
+      background-color: #333;
+    }
+    .quote-body {
+      display: none;
+      padding: 1em;
+    }
+    .quote-body.active {
+      display: block;
+      animation: fadeIn 0.5s ease-in;
+    }
+    .dropdown-selector {
+      margin: 1em 0;
+      background-color: #222;
+      color: #fff;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #444;
+      width: 100%;
+      max-width: 400px;
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">
+      <a href="../../../homepage.html">
+        <img src="../../../assets/images/logo.png" alt="LTL&G Logo">
+      </a>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="../AboutUs.html">About Us</a></li>
+        <li><a href="../ContactUs.html">Contact</a></li>
+        <li>
+          <a href="NavDropdownSubMenu1.html" onclick="if(location.pathname.includes('NavDropdownSubMenu1.html')) location.reload();">Get a Quote</a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="content fade-in">
+    <h1>Request a Service Quote</h1>
+    <p>Select a service from the dropdown to jump directly to it, or browse manually below.</p>
+
+    <select id="quoteSelector" class="dropdown-selector">
+      <option value="">-- Select a Service --</option>
+    </select>
+
+    <div id="quote-sections" class="quote-accordion">
+      <!-- Content gets injected here -->
+    </div>
+  </main>
+
+  <footer class="site-footer fade-in delay">
+    <p>&copy; 2025 LTL&G Landscaping Services. All rights reserved.</p>
+  </footer>
+
+  <!-- Embedded JSON Data -->
+  <script type="application/json" id="quoteData">
+    [
+      {
+        "name": "Lawn Care",
+        "description": "Comprehensive mowing, edging, fertilizing and turf revitalization for healthy and vibrant lawns.",
+        "formFields": [
+          { "label": "Lawn Size (sq ft)", "type": "text", "name": "lawnSize" },
+          { "label": "Preferred Services", "type": "text", "name": "services" },
+          { "label": "Additional Notes", "type": "textarea", "name": "notes" }
+        ]
+      },
+      {
+        "name": "Tree Services",
+        "description": "Tree trimming, pruning, removal, health diagnostics, and emergency services.",
+        "formFields": [
+          { "label": "Number of Trees", "type": "number", "name": "treeCount" },
+          { "label": "Tree Types (if known)", "type": "text", "name": "treeTypes" },
+          { "label": "Urgency Level", "type": "text", "name": "urgency" }
+        ]
+      },
+      {
+        "name": "Leaf Removal",
+        "description": "Seasonal cleanup for large or small properties, removal and disposal of all yard debris.",
+        "formFields": [
+          { "label": "Yard Size (sq ft)", "type": "text", "name": "yardSize" },
+          { "label": "Do you need hauling?", "type": "text", "name": "hauling" },
+          { "label": "Frequency", "type": "text", "name": "frequency" }
+        ]
+      },
+      {
+        "name": "Gardening",
+        "description": "Flower bed setup, replanting, cloning, Germination and Routine soil care including seasonal decor planning.",
+        "formFields": [
+          { "label": "Project Description", "type": "textarea", "name": "description" },
+          { "label": "Preferred Plants/Colors", "type": "text", "name": "plants" },
+          { "label": "Do you have an existing bed?", "type": "text", "name": "existing" }
+        ]
+      }
+    ]
+  </script>
+
+  <script>
+    const container = document.getElementById("quote-sections");
+    const selector = document.getElementById("quoteSelector");
+    const json = document.getElementById("quoteData").textContent;
+    const data = JSON.parse(json);
+    let sectionMap = {};
+
+    function populateQuoteSections(data) {
+      container.innerHTML = '';
+      selector.innerHTML = '<option value="">-- Select a Service --</option>';
+      sectionMap = {};
+
+      data.forEach(opt => {
+        const section = document.createElement("div");
+        section.classList.add("quote-section");
+        section.id = `section-${opt.name.replace(/\s+/g, '')}`;
+
+        const header = document.createElement("div");
+        header.classList.add("quote-header");
+        header.textContent = opt.name;
+
+        const body = document.createElement("div");
+        body.classList.add("quote-body");
+
+        const description = document.createElement("p");
+        description.textContent = opt.description;
+
+        const form = document.createElement("form");
+        form.classList.add("quote-form");
+
+        opt.formFields.forEach(field => {
+          const label = document.createElement("label");
+          label.setAttribute("for", field.name);
+          label.textContent = field.label;
+
+          if (field.type === "textarea") {
+            const textarea = document.createElement("textarea");
+            textarea.id = field.name;
+            textarea.name = field.name;
+            textarea.rows = 5;
+            form.append(label, textarea);
+          } else {
+            const input = document.createElement("input");
+            input.type = field.type;
+            input.id = field.name;
+            input.name = field.name;
+            input.required = true;
+            form.append(label, input);
+          }
+        });
+
+        const submit = document.createElement("button");
+        submit.type = "submit";
+        submit.textContent = "Submit Quote Request";
+        form.appendChild(submit);
+
+        body.append(description, form);
+        header.addEventListener("click", () => {
+          body.classList.toggle("active");
+        });
+
+        section.append(header, body);
+        container.appendChild(section);
+
+        sectionMap[opt.name] = section;
+
+        const option = document.createElement("option");
+        option.value = opt.name;
+        option.textContent = opt.name;
+        selector.appendChild(option);
+      });
+
+      const hash = decodeURIComponent(location.hash.replace('#', ''));
+      if (hash && sectionMap[hash]) {
+        sectionMap[hash].querySelector(".quote-body").classList.add("active");
+        sectionMap[hash].scrollIntoView({ behavior: "smooth" });
+      }
+    }
+
+    selector.addEventListener("change", e => {
+      const selected = e.target.value;
+      if (sectionMap[selected]) {
+        document.querySelectorAll(".quote-body").forEach(b => b.classList.remove("active"));
+        const body = sectionMap[selected].querySelector(".quote-body");
+        body.classList.add("active");
+        sectionMap[selected].scrollIntoView({ behavior: "smooth" });
+      }
+    });
+
+    populateQuoteSections(data);
+  </script>
+</body>
+</html>
